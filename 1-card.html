@@ -1,53 +1,104 @@
- <!DOCTYPE html>
-<html lang="bn">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Scratch Card - 1</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scratch Card - 1 Reward</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: #f0f0f0; margin-top: 50px; }
-    .card {
-      background: #fff;
-      padding: 30px;
-      margin: 20px auto;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #scratch-container {
+      margin: 30px auto;
       width: 300px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      height: 150px;
       position: relative;
-    }
-    .scratch {
-      background: silver;
-      color: silver;
-      padding: 30px;
-      margin-top: 20px;
+      background: #ccc;
       border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #reward {
       font-size: 20px;
-      user-select: none;
-    }
-    .scratched {
-      color: black;
-      background: #c8f7c5;
-    }
-    .note {
-      font-size: 14px;
-      color: #555;
-      margin-top: 20px;
+      color: #fff;
+      background: #4caf50;
+      padding: 40px 0;
+      border-radius: 10px;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>আপনার ১টি স্ক্র্যাচ কার্ড</h2>
-    <div class="scratch" onclick="scratch(this)">পুরস্কার দেখুন</div>
-    <div class="note">স্ক্রিনশট নিয়ে আমাদের WhatsApp/Telegram-এ জমা দিন।</div>
+  <h1>🎉 Scratch to Reveal Your Reward! 🎁</h1>
+  <div id="scratch-container">
+    <div id="reward">You won ৳20 Mobile Recharge!</div>
+    <canvas id="scratch-canvas" width="300" height="150"></canvas>
   </div>
 
   <script>
-    function scratch(el) {
-      if (!el.classList.contains('scratched')) {
-        el.classList.add('scratched');
-        el.innerText = "৳২০ মোবাইল রিচার্জ!";
-      }
+    const canvas = document.getElementById("scratch-canvas");
+    const ctx = canvas.getContext("2d");
+    let isDrawing = false;
+
+    const brushRadius = 20;
+
+    function scratch(x, y) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
+      ctx.fill();
     }
+
+    canvas.addEventListener("mousedown", (e) => {
+      isDrawing = true;
+      scratch(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (isDrawing) scratch(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      isDrawing = false;
+    });
+
+    // Mobile touch support
+    canvas.addEventListener("touchstart", (e) => {
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left;
+      const y = e.touches[0].clientY - rect.top;
+      scratch(x, y);
+    });
+
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      if (isDrawing) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        scratch(x, y);
+      }
+    });
+
+    canvas.addEventListener("touchend", () => {
+      isDrawing = false;
+    });
+
+    // Fill scratch area with grey
+    ctx.fillStyle = "#999";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   </script>
 </body>
 </html>
