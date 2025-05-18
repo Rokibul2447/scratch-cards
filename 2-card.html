@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Scratch Card - 2</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      margin-top: 50px;
+    }
+    .card {
+      background: #fff;
+      padding: 30px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .scratch {
+      background: silver;
+      color: silver;
+      padding: 30px;
+      border-radius: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      user-select: none;
+    }
+    .scratch.revealed {
+      color: green;
+    }
+    .instruction {
+      font-size: 14px;
+      margin-top: 20px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h2>আপনার ২টি স্ক্র্যাচ কার্ড নিচে দেখুন</h2>
+
+  <div class="card">
+    <div class="scratch" onclick="reveal(this)">৳২০ মোবাইল রিচার্জ</div>
+  </div>
+
+  <div class="card">
+    <div class="scratch" onclick="reveal(this)">৳৫০ মোবাইল রিচার্জ</div>
+  </div>
+
+  <div class="instruction">
+    স্ক্রিনশট নিয়ে পুরস্কার দাবির ফর্মে জমা দিন
+  </div>
+
+  <script>
+    function reveal(el) {
+      el.classList.add('revealed');
+    }
+  </script>
+</body>
+</html>
