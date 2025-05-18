@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scratch Card - 3</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      margin-top: 50px;
+    }
+    .card {
+      background: #fff;
+      padding: 30px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .scratch {
+      background: silver;
+      color: silver;
+      padding: 30px;
+      border-radius: 10px;
+      font-size: 24px;
+      user-select: none;
+      transition: color 1s;
+    }
+    .scratch:hover {
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Scratch Card</h2>
+    <div class="scratch">You won ৳30!</div>
+  </div>
+</body>
+</html>
