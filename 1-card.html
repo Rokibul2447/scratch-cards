@@ -1,0 +1,53 @@
+ <!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Scratch Card - 1</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #f0f0f0; margin-top: 50px; }
+    .card {
+      background: #fff;
+      padding: 30px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .scratch {
+      background: silver;
+      color: silver;
+      padding: 30px;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-size: 20px;
+      user-select: none;
+    }
+    .scratched {
+      color: black;
+      background: #c8f7c5;
+    }
+    .note {
+      font-size: 14px;
+      color: #555;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>আপনার ১টি স্ক্র্যাচ কার্ড</h2>
+    <div class="scratch" onclick="scratch(this)">পুরস্কার দেখুন</div>
+    <div class="note">স্ক্রিনশট নিয়ে আমাদের WhatsApp/Telegram-এ জমা দিন।</div>
+  </div>
+
+  <script>
+    function scratch(el) {
+      if (!el.classList.contains('scratched')) {
+        el.classList.add('scratched');
+        el.innerText = "৳২০ মোবাইল রিচার্জ!";
+      }
+    }
+  </script>
+</body>
+</html>
