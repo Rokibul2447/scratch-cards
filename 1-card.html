@@ -37,80 +37,95 @@
       width: 100%;
       height: 100%;
     }
-    #expired-message {
-      display: none;
+    #message {
       color: red;
-      font-size: 18px;
+      font-weight: bold;
       margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>🎉 Scratch to Reveal Your Reward! 🎁</h1>
+  <div id="message"></div>
   <div id="scratch-container">
     <div id="reward">You won ৳20 Mobile Recharge!</div>
     <canvas id="scratch-canvas" width="300" height="150"></canvas>
   </div>
-
-  <div id="expired-message">⏰ Time's up! Try again tomorrow.</div>
 
   <script>
     const canvas = document.getElementById("scratch-canvas");
     const ctx = canvas.getContext("2d");
     let isDrawing = false;
     const brushRadius = 20;
+    const todayKey = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
 
-    function scratch(x, y) {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
-      ctx.fill();
-    }
+    const scratchUsed = localStorage.getItem("scratch-" + todayKey);
+    const scratchContainer = document.getElementById("scratch-container");
+    const messageBox = document.getElementById("message");
 
-    canvas.addEventListener("mousedown", (e) => {
-      isDrawing = true;
-      scratch(e.offsetX, e.offsetY);
-    });
+    if (scratchUsed) {
+      messageBox.innerText = "You have already scratched today. Please come back tomorrow!";
+      scratchContainer.style.display = "none";
+    } else {
+      // Timer (1 minute = 60000 ms)
+      setTimeout(() => {
+        scratchContainer.style.display = "none";
+        messageBox.innerText = "⏰ Time expired! Please try again tomorrow.";
+      }, 60000); // 1 minute
 
-    canvas.addEventListener("mousemove", (e) => {
-      if (isDrawing) scratch(e.offsetX, e.offsetY);
-    });
+      function scratch(x, y) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
+        ctx.fill();
+      }
 
-    canvas.addEventListener("mouseup", () => {
-      isDrawing = false;
-    });
+      function registerScratch() {
+        localStorage.setItem("scratch-" + todayKey, "used");
+      }
 
-    canvas.addEventListener("touchstart", (e) => {
-      isDrawing = true;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      const y = e.touches[0].clientY - rect.top;
-      scratch(x, y);
-    });
+      canvas.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        scratch(e.offsetX, e.offsetY);
+        registerScratch();
+      });
 
-    canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      if (isDrawing) {
+      canvas.addEventListener("mousemove", (e) => {
+        if (isDrawing) scratch(e.offsetX, e.offsetY);
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+      });
+
+      // Touch support
+      canvas.addEventListener("touchstart", (e) => {
+        isDrawing = true;
         const rect = canvas.getBoundingClientRect();
         const x = e.touches[0].clientX - rect.left;
         const y = e.touches[0].clientY - rect.top;
         scratch(x, y);
-      }
-    });
+        registerScratch();
+      });
 
-    canvas.addEventListener("touchend", () => {
-      isDrawing = false;
-    });
+      canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if (isDrawing) {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.touches[0].clientX - rect.left;
+          const y = e.touches[0].clientY - rect.top;
+          scratch(x, y);
+        }
+      });
 
-    // Fill scratch area with grey
-    ctx.fillStyle = "#999";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      canvas.addEventListener("touchend", () => {
+        isDrawing = false;
+      });
 
-    // ⏳ Hide scratch after 1 minute (60,000 ms)
-    setTimeout(() => {
-      document.getElementById("scratch-container").style.display = "none";
-      document.getElementById("expired-message").style.display = "block";
-    }, 60 * 1000); // 1 minute
+      // Fill scratch area
+      ctx.fillStyle = "#999";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   </script>
 </body>
 </html>
