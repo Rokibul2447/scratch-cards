@@ -38,23 +38,49 @@
       width: 100%;
       height: 100%;
     }
+    #expired-message {
+      display: none;
+      color: red;
+      font-size: 18px;
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
   <h1>🎉 Scratch to Reveal Your Rewards! 🎁</h1>
 
   <div class="scratch-container">
-    <div class="reward">You won ৳0 try Next Time!</div>
+    <div class="reward">You won ৳0 — Try Again Next Time!</div>
     <canvas class="scratch-canvas" width="300" height="150"></canvas>
   </div>
 
   <div class="scratch-container">
-    <div class="reward">You won ৳20 Bkash Or Mobail Recerge!</div>
+    <div class="reward">You won ৳20 Bkash or Mobile Recharge!</div>
     <canvas class="scratch-canvas" width="300" height="150"></canvas>
+  </div>
+
+  <div id="expired-message">
+    ⛔ <strong>সময় শেষ!</strong> স্ক্র্যাচ কার্ডগুলো আর সক্রিয় নেই।<br><br>
+    🕒 আপনি ৫ মিনিটের মধ্যে স্ক্র্যাচ করেননি।<br>
+    📞 প্রয়োজনে WhatsApp এ যোগাযোগ করুন:<br>
+    👉 <a href="https://wa.me/8801716774640" target="_blank">WhatsApp Now</a>
   </div>
 
   <script>
     const brushRadius = 20;
+    let expired = false;
+
+    const showExpiredMessage = () => {
+      document.querySelectorAll(".scratch-container").forEach(container => {
+        container.style.display = "none";
+      });
+      document.getElementById("expired-message").style.display = "block";
+    };
+
+    setTimeout(() => {
+      expired = true;
+      showExpiredMessage();
+    }, 5 * 60 * 1000); // 5 minutes
 
     document.querySelectorAll(".scratch-container").forEach(container => {
       const canvas = container.querySelector("canvas");
@@ -62,6 +88,7 @@
       let isDrawing = false;
 
       function scratch(x, y) {
+        if (expired) return;
         ctx.globalCompositeOperation = "destination-out";
         ctx.beginPath();
         ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
@@ -69,12 +96,13 @@
       }
 
       canvas.addEventListener("mousedown", (e) => {
+        if (expired) return;
         isDrawing = true;
         scratch(e.offsetX, e.offsetY);
       });
 
       canvas.addEventListener("mousemove", (e) => {
-        if (isDrawing) scratch(e.offsetX, e.offsetY);
+        if (isDrawing && !expired) scratch(e.offsetX, e.offsetY);
       });
 
       canvas.addEventListener("mouseup", () => {
@@ -82,6 +110,7 @@
       });
 
       canvas.addEventListener("touchstart", (e) => {
+        if (expired) return;
         isDrawing = true;
         const rect = canvas.getBoundingClientRect();
         const x = e.touches[0].clientX - rect.left;
@@ -91,7 +120,7 @@
 
       canvas.addEventListener("touchmove", (e) => {
         e.preventDefault();
-        if (isDrawing) {
+        if (isDrawing && !expired) {
           const rect = canvas.getBoundingClientRect();
           const x = e.touches[0].clientX - rect.left;
           const y = e.touches[0].clientY - rect.top;
