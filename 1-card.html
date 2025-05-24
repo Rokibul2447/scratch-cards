@@ -37,6 +37,12 @@
       width: 100%;
       height: 100%;
     }
+    #expired-message {
+      display: none;
+      color: red;
+      font-size: 18px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -46,11 +52,12 @@
     <canvas id="scratch-canvas" width="300" height="150"></canvas>
   </div>
 
+  <div id="expired-message">⏰ Time's up! Try again tomorrow.</div>
+
   <script>
     const canvas = document.getElementById("scratch-canvas");
     const ctx = canvas.getContext("2d");
     let isDrawing = false;
-
     const brushRadius = 20;
 
     function scratch(x, y) {
@@ -73,7 +80,6 @@
       isDrawing = false;
     });
 
-    // Mobile touch support
     canvas.addEventListener("touchstart", (e) => {
       isDrawing = true;
       const rect = canvas.getBoundingClientRect();
@@ -99,6 +105,12 @@
     // Fill scratch area with grey
     ctx.fillStyle = "#999";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // ⏳ Hide scratch after 1 minute (60,000 ms)
+    setTimeout(() => {
+      document.getElementById("scratch-container").style.display = "none";
+      document.getElementById("expired-message").style.display = "block";
+    }, 60 * 1000); // 1 minute
   </script>
 </body>
 </html>
