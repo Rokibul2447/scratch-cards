@@ -40,10 +40,95 @@
     }
     .overlay-message {
       font-size: 18px;
-      color: #ff0000;
-      margin-top: 20px;
+      color: #d60000;
+      margin-top: 30px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>🎉 আজকের ২টি স্ক্র্যাচ কার্ড ব্যবহার করুন! 🎁</h1>
+
+  <div id="alreadyScratchedMessage" class="overlay-message" style="display: none;">
+    আপনি আজকে ইতোমধ্যেই স্ক্র্যাচ করেছেন। দয়া করে আগামীকাল আবার চেষ্টা করুন!
+  </div>
+
+  <div class="scratch-container scratch-card">
+    <div class="reward">আপনি জিতেছেন ৳0, আবার চেষ্টা করুন!</div>
+    <canvas width="300" height="150"></canvas>
+  </div>
+
+  <div class="scratch-container scratch-card">
+    <div class="reward">আপনি জিতেছেন ৳২০ বিকাশ/মোবাইল রিচার্জ!</div>
+    <canvas width="300" height="150"></canvas>
+  </div>
+
+  <script>
+    const brushRadius = 20;
+    const today = new Date().toISOString().split('T')[0];
+    const localStorageKey = "scratch_date_2cards";
+
+    const hasScratchedToday = localStorage.getItem(localStorageKey) === today;
+    const alreadyMessage = document.getElementById("alreadyScratchedMessage");
+
+    if (hasScratchedToday) {
+      document.querySelectorAll(".scratch-card").forEach(card => card.style.display = "none");
+      alreadyMessage.style.display = "block";
+    } else {
+      document.querySelectorAll(".scratch-container").forEach(container => {
+        const canvas = container.querySelector("canvas");
+        const ctx = canvas.getContext("2d");
+        let isDrawing = false;
+
+        function scratch(x, y) {
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath();
+          ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+
+        canvas.addEventListener("mousedown", (e) => {
+          isDrawing = true;
+          scratch(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+          if (isDrawing) scratch(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener("mouseup", () => {
+          isDrawing = false;
+        });
+
+        canvas.addEventListener("touchstart", (e) => {
+          isDrawing = true;
+          const rect = canvas.getBoundingClientRect();
+          const x = e.touches[0].clientX - rect.left;
+          const y = e.touches[0].clientY - rect.top;
+          scratch(x, y);
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          if (isDrawing) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            scratch(x, y);
+          }
+        });
+
+        canvas.addEventListener("touchend", () => {
+          isDrawing = false;
+        });
+
+        // Fill with gray overlay
+        ctx.fillStyle = "#999";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      });
+
+      localStorage.setItem(localStorageKey, today);
+    }
+  </script>
+</body>
+</html>
