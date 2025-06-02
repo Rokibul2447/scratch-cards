@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scratch Card - 1 Reward</title>
+  <title>Scratch Card - 2 Rewards</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f2f2f2;
       text-align: center;
-      padding: 50px 20px;
+      padding: 40px 10px;
     }
     h1 {
       color: #333;
+      margin-bottom: 30px;
     }
-    #scratch-container {
-      margin: 30px auto;
+    .scratch-container {
+      margin: 20px auto;
       width: 300px;
       height: 150px;
       position: relative;
@@ -28,7 +29,7 @@
       top: 0;
       left: 0;
     }
-    #reward {
+    .reward {
       font-size: 20px;
       color: #fff;
       background: #4caf50;
@@ -37,94 +38,96 @@
       width: 100%;
       height: 100%;
     }
-    #message {
-      color: red;
+    .overlay-message {
+      font-size: 18px;
+      color: #d60000;
+      margin-top: 30px;
       font-weight: bold;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🎉 Scratch to Reveal Your Reward! 🎁</h1>
-  <div id="message"></div>
-  <div id="scratch-container">
-    <div id="reward">You won ৳20!</div>
-    <canvas id="scratch-canvas" width="300" height="150"></canvas>
+  <h1>🎉 আজকের ২টি স্ক্র্যাচ কার্ড ব্যবহার করুন! 🎁</h1>
+
+  <div id="alreadyScratchedMessage" class="overlay-message" style="display: none;">
+    আপনি আজকে ইতোমধ্যেই স্ক্র্যাচ করেছেন। দয়া করে আগামীকাল আবার চেষ্টা করুন!
+  </div>
+
+  <div class="scratch-container scratch-card">
+    <div class="reward">আপনি জিতেছেন ৳15!</div>
+    <canvas width="300" height="150"></canvas>
+  </div>
+
+  <div class="scratch-container scratch-card">
+    <div class="reward">আপনি জিতেছেন ৳10!</div>
+    <canvas width="300" height="150"></canvas>
   </div>
 
   <script>
-    const canvas = document.getElementById("scratch-canvas");
-    const ctx = canvas.getContext("2d");
-    let isDrawing = false;
     const brushRadius = 20;
-    const todayKey = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const today = new Date().toISOString().split('T')[0];
+    const localStorageKey = "scratch_date_2cards";
 
-    const scratchUsed = localStorage.getItem("scratch-" + todayKey);
-    const scratchContainer = document.getElementById("scratch-container");
-    const messageBox = document.getElementById("message");
+    const hasScratchedToday = localStorage.getItem(localStorageKey) === today;
+    const alreadyMessage = document.getElementById("alreadyScratchedMessage");
 
-    if (scratchUsed) {
-      messageBox.innerText = "You have already scratched today. Please come back tomorrow!";
-      scratchContainer.style.display = "none";
+    if (hasScratchedToday) {
+      document.querySelectorAll(".scratch-card").forEach(card => card.style.display = "none");
+      alreadyMessage.style.display = "block";
     } else {
-      // Timer (1 minute = 60000 ms)
-      setTimeout(() => {
-        scratchContainer.style.display = "none";
-        messageBox.innerText = "⏰ Time expired! Please try again tomorrow.";
-      }, 60000); // 1 minute
+      document.querySelectorAll(".scratch-container").forEach(container => {
+        const canvas = container.querySelector("canvas");
+        const ctx = canvas.getContext("2d");
+        let isDrawing = false;
 
-      function scratch(x, y) {
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.beginPath();
-        ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
-        ctx.fill();
-      }
+        function scratch(x, y) {
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath();
+          ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
+          ctx.fill();
+        }
 
-      function registerScratch() {
-        localStorage.setItem("scratch-" + todayKey, "used");
-      }
+        canvas.addEventListener("mousedown", (e) => {
+          isDrawing = true;
+          scratch(e.offsetX, e.offsetY);
+        });
 
-      canvas.addEventListener("mousedown", (e) => {
-        isDrawing = true;
-        scratch(e.offsetX, e.offsetY);
-        registerScratch();
-      });
+        canvas.addEventListener("mousemove", (e) => {
+          if (isDrawing) scratch(e.offsetX, e.offsetY);
+        });
 
-      canvas.addEventListener("mousemove", (e) => {
-        if (isDrawing) scratch(e.offsetX, e.offsetY);
-      });
+        canvas.addEventListener("mouseup", () => {
+          isDrawing = false;
+        });
 
-      canvas.addEventListener("mouseup", () => {
-        isDrawing = false;
-      });
-
-      // Touch support
-      canvas.addEventListener("touchstart", (e) => {
-        isDrawing = true;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.touches[0].clientX - rect.left;
-        const y = e.touches[0].clientY - rect.top;
-        scratch(x, y);
-        registerScratch();
-      });
-
-      canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        if (isDrawing) {
+        canvas.addEventListener("touchstart", (e) => {
+          isDrawing = true;
           const rect = canvas.getBoundingClientRect();
           const x = e.touches[0].clientX - rect.left;
           const y = e.touches[0].clientY - rect.top;
           scratch(x, y);
-        }
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          if (isDrawing) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            scratch(x, y);
+          }
+        });
+
+        canvas.addEventListener("touchend", () => {
+          isDrawing = false;
+        });
+
+        // Fill with gray overlay
+        ctx.fillStyle = "#999";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       });
 
-      canvas.addEventListener("touchend", () => {
-        isDrawing = false;
-      });
-
-      // Fill scratch area
-      ctx.fillStyle = "#999";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      localStorage.setItem(localStorageKey, today);
     }
   </script>
 </body>
